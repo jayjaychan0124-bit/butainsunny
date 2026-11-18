@@ -1,1 +1,99 @@
-Image dimensions changed from 4032x3024 to 3469x2602. Scale coordinates by 1.1623 horizontally and 1.1622 vertically. This image exceeded Read's pixel limit and was resized. Read processes only the first frame when resizing GIF or WebP images.
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>阳光高考 漏洞演示附件</title>
+<style>
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont, sans-serif;}
+body{background:#f3f5f7;padding:30px;}
+.card{max-width:920px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 2px 12px #00000018;padding:28px;}
+.title{font-size:22px;font-weight:bold;text-align:center;margin-bottom:24px;color:#222;}
+.box{border:1px solid #ddd;padding:20px;border-radius:10px;margin-bottom:20px;}
+.bad{border-color:#e66465;background:#fff7f7;}
+.info{border-color:#4285f4;background:#f0f7ff;}
+.safe{border-color:#34a853;background:#f2fbf4;}
+.highlight{color:#d93025;font-weight:bold;}
+.code-block{background:#222;color:#fff;padding:16px;border-radius:8px;text-align:left;font-family:Consolas,monospace;white-space:pre-wrap;word-break:break-all;margin:12px 0;}
+.input-area{margin-top:12px;}
+textarea{width:100%;padding:12px;border:1px solid #ccc;border-radius:6px;font-family:Consolas;font-size:14px;min-height:100px;}
+button{margin-top:10px;padding:8px 16px;background:#4285f4;color:#fff;border:none;border-radius:6px;cursor:pointer;}
+button:hover{background:#3367d6;}
+.result{margin-top:12px;padding:10px;border-radius:6px;background:#eee;min-height:40px;}
+.nav{text-align:center;margin-top:30px;}
+.nav a{display:inline-block;margin:0 8px;padding:10px 16px;background:#f0f0f0;border-radius:8px;text-decoration:none;color:#222;}
+.nav a:hover{background:#e4e4e4;}
+</style>
+</head>
+<body>
+<div class="card">
+<div class="title">阳光高考平台 漏洞演示附件</div>
+
+<!-- 漏洞1 示範（你可以改成你真實發現的漏洞） -->
+<div class="box bad">
+<h3>漏洞一：輸入點未做輸入過濾（XSS跨站腳本）</h3>
+<p><span class="highlight">漏洞現象：</span>平台部分表單輸入框未對用戶輸入內容做轉義過濾，輸入特殊腳本代碼後，前端頁面直接渲染輸入內容。</p>
+<p><span class="highlight">風險影響：</span>攻擊者可植入惡意腳本，誘導用戶洩露Cookie、登錄憑證，偽造頁面釣魚，冒用用戶身份操作。</p>
+<p><span class="highlight">修復方案：</span>前端輸出時對HTML特殊字符轉義；後端增加輸入白名單校驗；CSP安全頭配置；禁止未經審核的用戶內容直接渲染。</p>
+<div class="code-block">示範Payload：
+&lt;script&gt;alert('XSS測試')&lt;/script&gt;
+&lt;img src=x onerror=alert(1)&gt;
+</div>
+<div class="input-area">
+<p>模擬輸入器：</p>
+<textarea id="payload1" placeholder="在此輸入測試payload"></textarea>
+<button onclick="runTest1()">執行模擬測試（僅頁面演示，不會真實發送請求）</button>
+<div class="result" id="res1">測試結果：等待輸入</div>
+</div>
+</div>
+
+<!-- 漏洞2 示範 -->
+<div class="box bad">
+<h3>漏洞二：參數處理不當（SQL注入風險）</h3>
+<p><span class="highlight">漏洞現象：</span>GET/POST參數直接拼接進SQL語句，未使用預編譯參數綁定。</p>
+<p><span class="highlight">風險影響：</span>惡意參數可繞過登錄、查詢、篡改、刪除後台資料，洩露考生、報名敏感數據。</p>
+<p><span class="highlight">修復方案：</span>強制使用預編譯語句（PreparedStatement）；嚴格輸入校驗；最小權限數據庫賬號；關閉數據庫詳細報錯回顯。</p>
+<div class="code-block">示範Payload：
+' or 1=1--
+admin' --
+</div>
+<div class="input-area">
+<p>模擬輸入器：</p>
+<textarea id="payload2" placeholder="在此輸入測試payload"></textarea>
+<button onclick="runTest2()">執行模擬測試（僅頁面演示）</button>
+<div class="result" id="res2">測試結果：等待輸入</div>
+</div>
+</div>
+
+<!-- 漏洞3 邏輯/鏈接類，對應你之前那一類404、錯誤跳轉 -->
+<div class="box info">
+<h3>漏洞三：鏈接配置異常（錯誤跳轉、404引導）</h3>
+<p><span class="highlight">漏洞現象：</span>頁面按鈕綁定無效/錯誤外部鏈接，點擊後返回404，返回首頁按鈕指向其他站點。</p>
+<p><span class="highlight">風險影響：</span>用戶誤以為是官方功能入口，容易被誤導至外部不明網站，引發釣魚誤判、信譽風險。</p>
+<p><span class="highlight">修復方案：</span>清理無效鏈接；不存在的入口改為靜態文字提示；定期全站鏈接巡檢；增加鏈接白名單。</p>
+<div class="code-block">現場說明：
+該類無payload輸入，屬於前端資源配置問題，截圖可見跳轉404頁面。
+</div>
+</div>
+
+<div class="box safe">
+<h3>備註（提交用）</h3>
+<p>本頁為漏洞演示附件，<span class="highlight">僅模擬輸入展示原理，不會向陽光高考真實服務器發送任何請求</span>，配套截圖放在報告主體。</p>
+</div>
+
+<div class="nav">
+<a href="#">返回頁首</a>
+</div>
+</div>
+
+<script>
+function runTest1(){
+let val = document.getElementById('payload1').value;
+document.getElementById('res1').innerText = "模擬：已捕獲輸入內容 >> " + val + "（僅演示，未真實提交）";
+}
+function runTest2(){
+let val = document.getElementById('payload2').value;
+document.getElementById('res2').innerText = "模擬：已捕獲輸入內容 >> " + val + "（僅演示，未真實提交）";
+}
+</script>
+</body>
+</html>
