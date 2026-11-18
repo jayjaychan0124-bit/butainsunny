@@ -26,6 +26,7 @@ button:hover{background:#1565c0;}
 .page{display:none;}
 .page.active{display:block;}
 .desc-title{font-weight:bold;font-size:16px;margin-top:16px;color:#333;}
+.tip-text{color:#d93025;font-weight:500;margin-top:8px;}
 </style>
 </head>
 <body>
@@ -60,6 +61,7 @@ button:hover{background:#1565c0;}
         <input id="mailInput" placeholder="输入XSS脚本进行复现测试">
         <button onclick="runMailXSS()">提交测试</button>
         <div id="mailResult"></div>
+        <p class="tip-text">备注：在真实网站弹窗点击确定后，页面无任何响应，按钮失效。</p>
       </div>
     </div>
   </div>
@@ -70,7 +72,7 @@ button:hover{background:#1565c0;}
       <h3>2. 找回密码页面异常跳转伴随XSS风险</h3>
 
       <div class="desc-title">漏洞简要描述</div>
-      <p>正常输入合法用户名与验证码时，找回密码流程正常。但在用户名输入框植入XSS脚本并提交后，系统发生非正常跳转，异常输入情况下，业务逻辑不应当跳转新页面、也不应当返回登录首页，同时页面出现非正常场景的多余功能按钮，属于业务逻辑异常叠加前端XSS风险，存在被恶意利用构造异常页面的风险。</p>
+      <p>正常输入合法用户名与验证码时，找回密码流程正常；植入XSS脚本提交后，系统跳转至新页面，页面显示403操作被拒绝，并出现返回主页按钮。业务逻辑跳转不正确，属于业务逻辑异常叠加前端XSS风险，存在被恶意利用构造异常页面的风险。</p>
 
       <div class="desc-title">漏洞危害</div>
       <p>1. 攻击者可植入恶意JS代码，实现本地页面篡改、展示虚假内容。</p>
@@ -86,10 +88,13 @@ button:hover{background:#1565c0;}
 
       <div class="code-block">漏洞特征：
 业务逻辑异常跳转
+测试Payload：
+&lt;script&gt;alert('butian-test')&lt;/script&gt;
 </div>
       <div class="demo-area">
-        <p style="font-weight:bold">【真实漏洞逻辑模拟演示】找回密码用户名输入框</p>
-        <input id="pwdInput" placeholder="输入Payload测试找回密码模块">
+        <p style="font-weight:bold">【真实漏洞逻辑模拟演示】找回密码模块</p>
+        <input id="userInput" placeholder="用户名（在此输入Payload）">
+        <input id="codeInput" placeholder="验证码">
         <button onclick="runPwdDemo()">提交</button>
         <div id="pwdResult"></div>
       </div>
@@ -121,7 +126,7 @@ button:hover{background:#1565c0;}
 
       <div class="demo-area">
         <p style="font-weight:bold">【真实漏洞逻辑模拟演示】（即时渲染，与官网漏洞完全一致）</p>
-        <input id="searchInput" placeholder="輸入Payload，輸入即觸發渲染，無需點擊按鈕" oninput="runSearchXSS()">
+        <input id="searchInput" placeholder="输入Payload，输入即触发渲染，无需点击按钮" oninput="runSearchXSS()">
         <div id="searchResult"></div>
       </div>
     </div>
@@ -135,7 +140,7 @@ button:hover{background:#1565c0;}
   <!-- 分页按钮 -->
   <div class="nav">
     <button onclick="prevPage()">上一页</button>
-    <button onclick="nextPage()">下一页</button>
+    <button id="nextBtn" onclick="nextPage()">下一页</button>
   </div>
 </div>
 
@@ -143,12 +148,23 @@ button:hover{background:#1565c0;}
 let currentPage = 1;
 const totalPage = 3;
 
-// 分页切换
 function renderPage(){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   if(currentPage===1) document.getElementById('page1').classList.add('active');
   if(currentPage===2) document.getElementById('page2').classList.add('active');
   if(currentPage===3) document.getElementById('page3').classList.add('active');
+
+  // 第三页时，下一页按钮文字改为【最后一页】并且禁用
+  const nextBtn = document.getElementById('nextBtn');
+  if(currentPage >= totalPage){
+    nextBtn.innerText = '最后一页';
+    nextBtn.disabled = true;
+    nextBtn.style.background="#ddd";
+  }else{
+    nextBtn.innerText = '下一页';
+    nextBtn.disabled = false;
+    nextBtn.style.background="#f0f0f0";
+  }
 }
 function nextPage(){if(currentPage<totalPage){currentPage++;renderPage();}}
 function prevPage(){if(currentPage>1){currentPage--;renderPage();}}
@@ -157,12 +173,17 @@ function prevPage(){if(currentPage>1){currentPage--;renderPage();}}
 function runMailXSS(){
   let val = document.getElementById('mailInput').value;
   document.getElementById('mailResult').innerHTML = val;
+  // 模拟真实网站：弹窗触发后页面卡死，点击确定后页面依旧失效
+  setTimeout(()=>{
+    alert('脚本弹窗已触发，真实场景点击确定后页面无响应');
+  },100);
 }
 
-// 第2页：找回密码模拟
+// 第2页：找回密码模拟（用户名+验证码两行输入框）
 function runPwdDemo(){
-  let val = document.getElementById('pwdInput').value;
-  document.getElementById('pwdResult').innerHTML = "模拟：找回密码用户名输入：" + val;
+  let userVal = document.getElementById('userInput').value;
+  let codeVal = document.getElementById('codeInput').value;
+  document.getElementById('pwdResult').innerHTML = "模拟找回密码提交：<br>用户名：" + userVal + "<br>验证码：" + codeVal;
 }
 
 // 第3页：帮助中心搜索框，oninput即时渲染
@@ -170,6 +191,8 @@ function runSearchXSS(){
   let val = document.getElementById('searchInput').value;
   document.getElementById('searchResult').innerHTML = val;
 }
+
+renderPage();
 </script>
 
 </body>
