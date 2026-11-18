@@ -75,7 +75,7 @@ button:hover{background:#1565c0;}
         <button onclick="runMailXSS()">提交测试</button>
         <div id="mailResult"></div>
         <div id="mailErrorText" class="img-error-text" style="display:none;">[broken image]</div>
-        <p class="tip-text">备注：在真实网站弹窗点击确定后，页面出现图片加载失败文字串，页面无任何响应，按钮失效。</p>
+        <p class="tip-text">备注：输入测试XSS脚本,网站出現弹窗,点击确定后，页面出现視窗测试，按下確認按鈕，页面无任何响应。</p>
       </div>
     </div>
   </div>
@@ -84,7 +84,7 @@ button:hover{background:#1565c0;}
     <div class="box info">
       <h3>2. 找回密码页面异常跳转伴随XSS风险</h3>
       <div class="desc-title">漏洞简要描述</div>
-      <p>正常输入合法用户名与验证码时，找回密码流程正常；植入XSS脚本提交后，系统跳转至新页面，页面显示403操作被拒绝，并出现返回主页按钮。业务逻辑跳转不正确，属于业务逻辑异常叠加前端XSS风险，存在被恶意利用构造异常页面的风险。</p>
+      <p>正常输入合法用户名与验证码时，找回密码流程正常。植入XSS脚本提交后，系统跳转至新页面，页面显示403操作被拒绝，并出现返回主页按钮。业务逻辑跳转不正确，属于业务逻辑异常叠加前端XSS风险，存在被恶意利用构造异常页面的风险。</p>
       <div class="desc-title">漏洞危害</div>
       <p>1. 攻击者可植入恶意JS代码，实现本地页面篡改、展示虚假内容。</p>
       <p>2. 可构造钓鱼页面诱导考生泄露账号信息。</p>
@@ -109,7 +109,7 @@ button:hover{background:#1565c0;}
             <p>403 操作被拒绝</p>
             <button onclick="backToRetrieve()">返回找回密码页面</button>
         </div>
-        <p class="tip-text">备注：输入脚本代码后，原网址打开新页面显示403报错，页面带有返回找回密码的按钮。</p>
+        <p class="tip-text">备注：输入脚本代码后，原网址打开新，页面显示403报错，页面带有'返回找回密码'的按钮，返回註冊頁面。</p>
       </div>
     </div>
   </div>
@@ -136,7 +136,7 @@ button:hover{background:#1565c0;}
         <input id="searchInput" placeholder="输入Payload，输入即触发渲染，无需点击按钮" oninput="runSearchXSS()">
         <div id="searchResult"></div>
         <div id="searchErrorText" class="img-error-text" style="display:none;">[broken image]</div>
-        <p class="tip-text">备注：弹窗触发后页面出现图片加载失败文字串，页面无任何响应。</p>
+        <p class="tip-text">备注：注入測試腳本XSS不需要按確定鍵己經觸發彈窗的效果，網址並沒有改變。</p>
       </div>
     </div>
     <div class="box safe">
@@ -191,7 +191,7 @@ function renderPage(){
 }
 function nextPage(){if(currentPage<totalPage){currentPage++;renderPage();}}
 function prevPage(){if(currentPage>1){currentPage--;renderPage();}}
-// 第1頁：註冊安全郵箱，彈窗後顯示圖片失敗文字串
+// 第1頁：輸入測試腳本，註冊安全郵箱，顯示彈窗
 function runMailXSS(){
   let val = document.getElementById('mailInput').value;
   document.getElementById('mailResult').innerHTML = val;
@@ -200,7 +200,7 @@ function runMailXSS(){
     document.getElementById('mailErrorText').style.display='block';
   },100);
 }
-// 第2頁：找回密碼，只顯示403面板，取消原本用戶名驗證碼文字
+// 第2頁：找回密碼，只顯示403面板，並顯示按鈕回到註冊頁面
 function runPwdDemo(){
   document.getElementById('panel403').style.display='block';
 }
@@ -208,7 +208,7 @@ function runPwdDemo(){
 function backToRetrieve(){
   document.getElementById('panel403').style.display='none';
 }
-// 第3頁：幫助中心搜索，輸入觸發彈窗+圖片失敗文字
+// 第3頁：幫助中心搜索，輸入觸發彈窗。
 function runSearchXSS(){
   let val = document.getElementById('searchInput').value;
   document.getElementById('searchResult').innerHTML = val;
