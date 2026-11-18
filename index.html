@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -27,6 +28,25 @@ button:hover{background:#1565c0;}
 .page.active{display:block;}
 .desc-title{font-weight:bold;font-size:16px;margin-top:16px;color:#333;}
 .tip-text{color:#d93025;font-weight:500;margin-top:8px;}
+/* 圖片失敗文字串樣式 */
+.img-error-text{
+    color:#bb2222;
+    font-family:Consolas,monospace;
+    margin-top:10px;
+}
+/* 403模擬面板 */
+.panel-403{
+    margin-top:12px;
+    padding:16px;
+    background:#222;
+    color:#ff4444;
+    border-radius:8px;
+    display:none;
+}
+.panel-403 button{
+    margin-top:10px;
+    background:#4488ff;
+}
 </style>
 </head>
 <body>
@@ -61,7 +81,8 @@ button:hover{background:#1565c0;}
         <input id="mailInput" placeholder="输入XSS脚本进行复现测试">
         <button onclick="runMailXSS()">提交测试</button>
         <div id="mailResult"></div>
-        <p class="tip-text">备注：在真实网站弹窗点击确定后，页面无任何响应，按钮失效。</p>
+        <div id="mailErrorText" class="img-error-text" style="display:none;">[broken image]</div>
+        <p class="tip-text">备注：在真实网站弹窗点击确定后，页面出现图片加载失败文字串，页面无任何响应，按钮失效。</p>
       </div>
     </div>
   </div>
@@ -96,7 +117,11 @@ button:hover{background:#1565c0;}
         <input id="userInput" placeholder="用户名（在此输入Payload）">
         <input id="codeInput" placeholder="验证码">
         <button onclick="runPwdDemo()">提交</button>
-        <div id="pwdResult"></div>
+        <div class="panel-403" id="panel403">
+            <p>403 操作被拒绝</p>
+            <button onclick="backToRetrieve()">返回找回密码页面</button>
+        </div>
+        <p class="tip-text">备注：输入脚本代码后，原网址打开新页面显示403报错，页面带有返回找回密码的按钮。</p>
       </div>
     </div>
   </div>
@@ -128,6 +153,8 @@ button:hover{background:#1565c0;}
         <p style="font-weight:bold">【真实漏洞逻辑模拟演示】（即时渲染，与官网漏洞完全一致）</p>
         <input id="searchInput" placeholder="输入Payload，输入即触发渲染，无需点击按钮" oninput="runSearchXSS()">
         <div id="searchResult"></div>
+        <div id="searchErrorText" class="img-error-text" style="display:none;">[broken image]</div>
+        <p class="tip-text">备注：弹窗触发后页面出现图片加载失败文字串，页面无任何响应。</p>
       </div>
     </div>
 
@@ -154,7 +181,13 @@ function renderPage(){
   if(currentPage===2) document.getElementById('page2').classList.add('active');
   if(currentPage===3) document.getElementById('page3').classList.add('active');
 
-  // 第三页时，下一页按钮文字改为【最后一页】并且禁用
+  // 切頁重置所有模擬組件
+  document.getElementById('panel403').style.display='none';
+  document.getElementById('mailErrorText').style.display='none';
+  document.getElementById('searchErrorText').style.display='none';
+  document.getElementById('mailResult').innerHTML = '';
+  document.getElementById('searchResult').innerHTML = '';
+
   const nextBtn = document.getElementById('nextBtn');
   if(currentPage >= totalPage){
     nextBtn.innerText = '最后一页';
@@ -169,27 +202,33 @@ function renderPage(){
 function nextPage(){if(currentPage<totalPage){currentPage++;renderPage();}}
 function prevPage(){if(currentPage>1){currentPage--;renderPage();}}
 
-// 第1页：实名注册安全邮箱 XSS
+// 第1頁：註冊安全郵箱，彈窗後顯示圖片失敗文字串
 function runMailXSS(){
   let val = document.getElementById('mailInput').value;
   document.getElementById('mailResult').innerHTML = val;
-  // 模拟真实网站：弹窗触发后页面卡死，点击确定后页面依旧失效
   setTimeout(()=>{
-    alert('脚本弹窗已触发，真实场景点击确定后页面无响应');
+    alert('脚本弹窗已触发');
+    document.getElementById('mailErrorText').style.display='block';
   },100);
 }
 
-// 第2页：找回密码模拟（用户名+验证码两行输入框）
+// 第2頁：找回密碼，只顯示403面板，取消原本用戶名驗證碼文字
 function runPwdDemo(){
-  let userVal = document.getElementById('userInput').value;
-  let codeVal = document.getElementById('codeInput').value;
-  document.getElementById('pwdResult').innerHTML = "模拟找回密码提交：<br>用户名：" + userVal + "<br>验证码：" + codeVal;
+  document.getElementById('panel403').style.display='block';
+}
+// 返回找回密碼模擬
+function backToRetrieve(){
+  document.getElementById('panel403').style.display='none';
 }
 
-// 第3页：帮助中心搜索框，oninput即时渲染
+// 第3頁：幫助中心搜索，輸入觸發彈窗+圖片失敗文字串
 function runSearchXSS(){
   let val = document.getElementById('searchInput').value;
   document.getElementById('searchResult').innerHTML = val;
+  setTimeout(()=>{
+    alert('脚本弹窗已触发');
+    document.getElementById('searchErrorText').style.display='block';
+  },100);
 }
 
 renderPage();
