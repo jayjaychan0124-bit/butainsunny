@@ -2,116 +2,175 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>阳光高考 漏洞演示附件</title>
+<title>阳光高考平台多处用户可控输入点存在DOM型跨站脚本漏洞（DOM‑XSS）</title>
 <style>
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont, sans-serif;}
-body{background:#f3f5f7;padding:30px;}
+body{background:#f3f5f7;padding:30px;margin:0;}
 .card{max-width:920px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 2px 12px #00000018;padding:28px;}
 .title{font-size:22px;font-weight:bold;text-align:center;margin-bottom:24px;color:#222;}
-.box{border:1px solid #ddd;padding:20px;border-radius:10px;margin-bottom:20px;}
+.box{border:1px solid #ddd;padding:24px;border-radius:10px;margin-bottom:20px;}
 .bad{border-color:#e66465;background:#fff7f7;}
 .info{border-color:#4285f4;background:#f0f7ff;}
 .safe{border-color:#34a853;background:#f2fbf4;}
+h3{margin-top:0;margin-bottom:16px;}
+p{font-size:15px;line-height:1.7;margin:8px 0;}
 .highlight{color:#d93025;font-weight:bold;}
 .code-block{background:#222;color:#fff;padding:16px;border-radius:8px;text-align:left;font-family:Consolas,monospace;white-space:pre-wrap;word-break:break-all;margin:12px 0;}
-.input-area{margin-top:12px;}
-input{width:100%;padding:12px;border:1px solid #ccc;border-radius:6px;font-family:Consolas;font-size:14px;}
-button{margin-top:10px;padding:8px 16px;background:#4285f4;color:#fff;border:none;border-radius:6px;cursor:pointer;}
-button:hover{background:#3367d6;}
-.result{margin-top:12px;padding:10px;border-radius:6px;background:#eee;min-height:40px;}
+.demo-area{margin:20px 0;padding:16px;border:1px dashed #999;border-radius:8px;background:#fafafa;}
+input{width:100%;height:42px;padding:0 12px;border:1px solid #ccc;border-radius:6px;font-size:14px;margin-bottom:10px;}
+button{padding:9px 18px;background:#1976d2;color:#fff;border:none;border-radius:6px;cursor:pointer;}
+button:hover{background:#1565c0;}
 .nav{text-align:center;margin-top:30px;}
-.nav button{margin:0 8px;background:#f0f0f0;color:#222;}
+.nav button{margin:0 6px;background:#f0f0f0;color:#222;}
 .nav button:hover{background:#e4e4e4;}
 .page{display:none;}
 .page.active{display:block;}
+.desc-title{font-weight:bold;font-size:16px;margin-top:16px;color:#333;}
 </style>
 </head>
 <body>
 <div class="card">
-<div class="title">阳光高考平台 漏洞演示附件</div>
+  <div class="title">阳光高考平台多处用户可控输入点存在DOM型跨站脚本漏洞（DOM‑XSS）</div>
 
-<!-- 第1頁：漏洞一 DOM-XSS -->
-<div class="page active" id="page1">
-<div class="box bad">
-<h3>漏洞一：註冊頁安全郵箱 DOM-XSS 跨站腳本漏洞</h3>
-<p><span class="highlight">漏洞現象：</span>平台註冊模塊安全郵箱輸入點未對用戶輸入做HTML轉義過濾，用戶輸入腳本後前端直接渲染DOM，執行惡意代碼。</p>
-<p><span class="highlight">風險影響：</span>攻擊者可植入惡意腳本，竊取Cookie、登錄憑證，偽造頁面實施釣魚，冒用用戶身份操作。</p>
-<p><span class="highlight">修復方案：</span>前端輸出時對HTML特殊字符進行轉義；後端增加輸入白名單校驗；配置CSP安全響應頭；禁止未經過濾的用戶可控內容直接渲染到DOM。</p>
-<div class="code-block">Payload：
-&lt;script&gt;alert('butian-test')&lt;/script&gt;
+  <!-- ========== 第1页：实名注册‑安全邮箱输入点XSS漏洞 ========== -->
+  <div class="page active" id="page1">
+    <div class="box bad">
+      <h3>1. 实名注册‑安全邮箱输入点XSS漏洞</h3>
+
+      <div class="desc-title">漏洞简要描述</div>
+      <p>在阳光高考实名注册页面的安全邮箱输入框中，插入XSS测试脚本后，页面可正常解析并触发弹窗执行恶意代码。前端仅校验邮箱格式合法性，未做安全字符过滤，存在前端脚本注入风险。</p>
+
+      <div class="desc-title">漏洞危害</div>
+      <p>1. 攻击者可植入恶意JS代码，实现本地页面篡改、展示虚假内容。</p>
+      <p>2. 可构造钓鱼页面诱导考生泄露账号信息。</p>
+      <p>3. 多处功能复用相同不安全代码，说明全站前端缺乏统一安全过滤规范，存在批量安全隐患。</p>
+
+      <div class="desc-title">修复方案</div>
+      <p>1. 全站统一增加HTML实体转义，对 &lt; &gt; &amp; " ' 等特殊字符强制转义，禁止浏览器解析恶意标签与事件代码。</p>
+      <p>2. 前端增加XSS黑名单过滤，拦截 script、img、onerror、onload、svg、javascript: 等常见恶意关键字。</p>
+      <p>3. 补齐后端参数安全校验，弥补前端校验可被绕过的问题，形成双重防护。</p>
+
+      <div class="code-block">可用测试Payload：
 &lt;img src=x onerror=alert('butian-test')&gt;
-</div>
-<div class="input-area">
-<p>模擬註冊安全郵箱輸入框（和真實漏洞邏輯一致）：</p>
-<input id="xssInput" placeholder="在此輸入XSS payload，點擊提交">
-<button onclick="submitXss()">提交</button>
-<div class="result" id="xssResult">渲染結果：等待提交</div>
-</div>
-</div>
+&lt;svg onload=alert('butian-test')&gt;
 </div>
 
-<!-- 第2頁：漏洞二 + 漏洞三 -->
-<div class="page" id="page2">
-<div class="box bad">
-<h3>漏洞二：參數處理不當（SQL注入風險）</h3>
-<p><span class="highlight">漏洞現象：</span>GET/POST參數直接拼接進SQL語句，未使用預編譯參數綁定。</p>
-<p><span class="highlight">風險影響：</span>惡意參數可繞過登錄、查詢、篡改、刪除後台資料，洩露考生、報名敏感數據。</p>
-<p><span class="highlight">修復方案：</span>強制使用預編譯語句（PreparedStatement）；嚴格輸入校驗；數據庫賬號最小權限；關閉數據庫詳細報錯回顯。</p>
-<div class="code-block">示範Payload：
-' or 1=1--
-admin' --
+      <div class="demo-area">
+        <p style="font-weight:bold">【真实漏洞逻辑模拟演示】（与官网漏洞完全一致）</p>
+        <input id="mailInput" placeholder="输入XSS脚本进行复现测试">
+        <button onclick="runMailXSS()">提交测试</button>
+        <div id="mailResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 第2页：找回密码页面异常跳转伴随XSS风险 ========== -->
+  <div class="page" id="page2">
+    <div class="box info">
+      <h3>2. 找回密码页面异常跳转伴随XSS风险</h3>
+
+      <div class="desc-title">漏洞简要描述</div>
+      <p>正常输入合法用户名与验证码时，找回密码流程正常。但在用户名输入框植入XSS脚本并提交后，系统发生非正常跳转，异常输入情况下，业务逻辑不应当跳转新页面、也不应当返回登录首页，同时页面出现非正常场景的多余功能按钮，属于业务逻辑异常叠加前端XSS风险，存在被恶意利用构造异常页面的风险。</p>
+
+      <div class="desc-title">漏洞危害</div>
+      <p>1. 攻击者可植入恶意JS代码，实现本地页面篡改、展示虚假内容。</p>
+      <p>2. 可构造钓鱼页面诱导考生泄露账号信息。</p>
+      <p>3. 多处功能复用相同不安全代码，说明全站前端缺乏统一安全过滤规范，存在批量安全隐患。</p>
+      <p>4. 找回密码模块存在异常跳转逻辑缺陷，可被配合前端漏洞放大攻击效果。</p>
+
+      <div class="desc-title">修复方案</div>
+      <p>1. 全站统一增加HTML实体转义，对 &lt; &gt; &amp; " ' 等特殊字符强制转义，禁止浏览器解析恶意标签与事件代码。</p>
+      <p>2. 前端增加XSS黑名单过滤，拦截 script、img、onerror、onload、svg、javascript: 等常见恶意关键字。</p>
+      <p>3. 修复找回密码异常跳转漏洞，修正找回密码业务逻辑，输入异常、非法参数时禁止跳转新页面，统一在当前页面输出错误提示，隐藏异常场景下多余按钮，修复逻辑混乱问题。</p>
+      <p>4. 补齐后端参数安全校验，弥补前端校验可被绕过的问题，形成双重防护。</p>
+
+      <div class="code-block">漏洞特征：
+业务逻辑异常跳转
 </div>
+      <div class="demo-area">
+        <p style="font-weight:bold">【真实漏洞逻辑模拟演示】找回密码用户名输入框</p>
+        <input id="pwdInput" placeholder="输入Payload测试找回密码模块">
+        <button onclick="runPwdDemo()">提交</button>
+        <div id="pwdResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 第3页：帮助中心搜索框即时触发XSS漏洞 ========== -->
+  <div class="page" id="page3">
+    <div class="box bad">
+      <h3>3. 帮助中心搜索框即时触发XSS漏洞</h3>
+
+      <div class="desc-title">漏洞简要描述</div>
+      <p>在学信网帮助中心搜索栏目输入恶意XSS脚本，无需点击搜索、无需提交数据，仅输入内容即可即时触发前端DOM渲染漏洞，自动弹出恶意脚本弹窗。该功能前端直接信任用户输入内容，使用不安全DOM渲染方式，导致无需交互即可触发XSS，风险触发条件极低。</p>
+
+      <div class="desc-title">漏洞危害</div>
+      <p>1. 攻击者可植入恶意JS代码，实现本地页面篡改、展示虚假内容。</p>
+      <p>2. 可构造钓鱼页面诱导考生泄露账号信息。</p>
+      <p>3. 多处功能复用相同不安全代码，说明全站前端缺乏统一安全过滤规范，存在批量安全隐患。</p>
+
+      <div class="desc-title">修复方案</div>
+      <p>1. 全站统一增加HTML实体转义，对 &lt; &gt; &amp; " ' 等特殊字符强制转义，禁止浏览器解析恶意标签与事件代码。</p>
+      <p>2. 前端增加XSS黑名单过滤，拦截 script、img、onerror、onload、svg、javascript: 等常见恶意关键字。</p>
+      <p>3. 修复帮助中心即时渲染逻辑，将不安全的HTML渲染方式改为纯文本渲染，禁止直接解析用户输入内容，彻底杜绝无交互自动触发DOM‑XSS漏洞。</p>
+      <p>4. 补齐后端参数安全校验，弥补前端校验可被绕过的问题，形成双重防护。</p>
+
+      <div class="code-block">可用测试Payload：
+&lt;img src=x onerror=alert('help-xss')&gt;
 </div>
 
-<div class="box info">
-<h3>漏洞三：鏈接配置異常（錯誤跳轉、403攔截）</h3>
-<p><span class="highlight">漏洞現象：</span>找回密碼模塊輸入特殊payload後，跳轉至password!retrive.action頁面，觸發403 Forbidden操作被拒，頁面流程異常，返回首頁按鈕邏輯異常。</p>
-<p><span class="highlight">風險影響：</span>頁面流程異常，容易被利用做業務邏輯測試；用戶容易誤導，引發信譽風險。</p>
-<p><span class="highlight">修復方案：</span>完善參數校驗，非法輸入直接攔截並返回統一錯誤頁；規範頁面跳轉邏輯；定期全站鏈接巡檢。</p>
-<div class="code-block">現場說明：
-該漏洞無payload執行，屬於業務參數校驗與頁面跳轉缺陷，證據見截圖403頁面。
-</div>
-</div>
-</div>
+      <div class="demo-area">
+        <p style="font-weight:bold">【真实漏洞逻辑模拟演示】（即时渲染，与官网漏洞完全一致）</p>
+        <input id="searchInput" placeholder="輸入Payload，輸入即觸發渲染，無需點擊按鈕" oninput="runSearchXSS()">
+        <div id="searchResult"></div>
+      </div>
+    </div>
 
-<div class="box safe">
-<h3>備註（提交補天SRC用）</h3>
-<p>本頁為漏洞演示附件，<span class="highlight">僅本地模擬漏洞原理，不會向陽光高考真實服務器發送任何請求</span>，漏洞真實證據以報告內截圖附件為準。</p>
-</div>
+    <div class="box safe">
+      <h3>官方提交备注</h3>
+      <p>本演示页面仅为本地原理模拟，<span class="highlight">不会向阳光高考/学信网真实服务器发送任何请求</span>，所有真实漏洞复现证据均以报告截图为准。</p>
+    </div>
+  </div>
 
-<div class="nav">
-<button onclick="prevPage()">上一頁</button>
-<button onclick="nextPage()">下一頁</button>
-</div>
+  <!-- 分页按钮 -->
+  <div class="nav">
+    <button onclick="prevPage()">上一页</button>
+    <button onclick="nextPage()">下一页</button>
+  </div>
 </div>
 
 <script>
 let currentPage = 1;
-const totalPage = 2;
+const totalPage = 3;
 
+// 分页切换
 function renderPage(){
-document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-if(currentPage === 1) document.getElementById('page1').classList.add('active');
-if(currentPage === 2) document.getElementById('page2').classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  if(currentPage===1) document.getElementById('page1').classList.add('active');
+  if(currentPage===2) document.getElementById('page2').classList.add('active');
+  if(currentPage===3) document.getElementById('page3').classList.add('active');
 }
-function nextPage(){
-if(currentPage < totalPage){
-currentPage++;
-renderPage();
-}
-}
-function prevPage(){
-if(currentPage > 1){
-currentPage--;
-renderPage();
-}
+function nextPage(){if(currentPage<totalPage){currentPage++;renderPage();}}
+function prevPage(){if(currentPage>1){currentPage--;renderPage();}}
+
+// 第1页：实名注册安全邮箱 XSS
+function runMailXSS(){
+  let val = document.getElementById('mailInput').value;
+  document.getElementById('mailResult').innerHTML = val;
 }
 
-// XSS渲染邏輯，就是你原本的demo效果
-function submitXss(){
-let val = document.getElementById('xssInput').value;
-document.getElementById('xssResult').innerHTML = "您填寫的安全郵箱：" + val;
+// 第2页：找回密码模拟
+function runPwdDemo(){
+  let val = document.getElementById('pwdInput').value;
+  document.getElementById('pwdResult').innerHTML = "模拟：找回密码用户名输入：" + val;
+}
+
+// 第3页：帮助中心搜索框，oninput即时渲染
+function runSearchXSS(){
+  let val = document.getElementById('searchInput').value;
+  document.getElementById('searchResult').innerHTML = val;
 }
 </script>
+
 </body>
 </html>
