@@ -62,7 +62,7 @@ button:hover{background:#1565c0;}
       <p>2. 可构造钓鱼页面诱导考生泄露账号信息。</p>
       <p>3. 多处功能复用相同不安全代码，说明全站前端缺乏统一安全过滤规范，存在批量安全隐患。</p>
       <div class="desc-title">修复方案</div>
-      <p>1. 全站统一增加HTML，对 &lt; &gt; &amp; " ' 等特殊字符强制過濾，禁止浏览器解析恶意标签与事件代码。</p>
+      <p>1. 全站统一增加HTML，对 &lt; &gt; &amp; " ' 等特殊字符强制过滤，禁止浏览器解析恶意标签与事件代码。</p>
       <p>2. 前端增加XSS黑名单过滤，拦截 script、img、onerror、onload、svg、javascript: 等常见恶意关键字。</p>
       <p>3. 补齐后端参数安全校验，弥补前端校验可被绕过的问题，形成双重防护。</p>
       <div class="code-block">可用测试Payload：
@@ -76,7 +76,7 @@ button:hover{background:#1565c0;}
         <div id="mailResult"></div>
         <div id="mailErrorText" class="img-error-text" style="display:none;">[broken image]</div>
         <p class="tip-text">备注：原網頁输入测试XSS脚本,网站出現弹窗,点击确定后，页面出现視窗测试，按下確認按鈕，页面无任何响应。</p>
-          <p class="tip-text">(標籤被當成一個不完整的HTML元素，確認後瀏覽器會將內容當成圖片所以會出現經典破圖）。</p>      </div>
+          <p class="tip-text">(标签被当成一个不完整的HTML元素，确认后浏览器会将内容当成图片所以会出现经典破图）。</p>      </div>
     </div>
   </div>
   <!-- ========== 第2页：找回密码页面异常跳转伴随XSS风险 ========== -->
@@ -93,7 +93,7 @@ button:hover{background:#1565c0;}
       <div class="desc-title">修复方案</div>
       <p>1. 全站统一增加HTML过滤，对 &lt; &gt; &amp; " ' 等特殊字符强制过滤，禁止浏览器解析恶意标签与事件代码。</p>
       <p>2. 前端增加XSS黑名单过滤，拦截 script、img、onerror、onload、svg、javascript: 等常见恶意关键字。</p>
-      <p>3. 修复找回密码异常跳转漏洞，修正找回密码业务逻辑，輸入示範非法標籤模板時，不要跳轉到新頁面，直接在當前頁返回規範的錯誤提示。</p>
+      <p>3. 修复找回密码异常跳转漏洞，修正找回密码业务逻辑，输入示范非法标签模板时，不要跳转到新页面，直接在当前页返回规范的错误提示。</p>
       <p>4. 补齐后端参数安全校验，弥补前端校验可被绕过的问题，形成双重防护。</p>
       <div class="code-block">漏洞特征：
 业务逻辑异常跳转
@@ -137,7 +137,7 @@ button:hover{background:#1565c0;}
         <div id="searchResult"></div>
         <div id="searchErrorText"style="display:none;(1)">[broken image]</div>
         <p class="tip-text">备注：注入測試腳本XSS不需要按確定鍵己經觸發彈窗的效果，網址並沒有改變。</p>
- <p class="tip-text">(標籤被當成一個不完整的HTML元素，確認後瀏覽器會將內容當成圖片所以會出現經典破圖）。</p>      </div>
+ <p class="tip-text">(标签被当成一个不完整的HTML元素，确认后浏览器会将内容当成图片所以会出现经典破图）。</p>      </div>
     </div>
     <div class="box safe">
       <h3>官方提交备注</h3>
