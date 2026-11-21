@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>阳光高考平台多处用户可控输入点存在DOM型跨站脚本漏洞（DOM‑XSS）-第3页</title>
+<title>阳光高考平台多处用户可控输入点存在DOM‑XSS漏洞‑第3页</title>
 <style>
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont, sans-serif;}
 body{background:#f3f5f7;padding:30px;margin:0;}
@@ -20,10 +20,24 @@ p{font-size:15px;line-height:1.7;margin:8px 0;}
 input{width:100%;height:42px;padding:0 12px;border:1px solid #ccc;border-radius:6px;font-size:14px;margin-bottom:10px;}
 button{padding:9px 18px;background:#1976d2;color:#fff;border:none;border-radius:6px;cursor:pointer;}
 button:hover{background:#1565c0;}
-.nav{text-align:center;margin-top:30px;}
-.nav a{display:inline-block;margin:0 6px;padding:9px 18px;background:#f0f0f0;color:#222;text-decoration:none;border-radius:6px;}
-.nav a.disabled{background:#ddd;cursor:not-allowed;pointer-events:none;}
-.nav a:hover:not(.disabled){background:#e4e4e4;}
+/* ========== 分頁按鈕，與提交按鈕相同藍色 ========== */
+.nav{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:30px;
+}
+.nav-btn{
+background:#1976d2;
+color:#ffffff;
+text-decoration:none;
+padding:10px 18px;
+border-radius:6px;
+font-weight:bold;
+}
+.nav-btn:hover{
+background:#1565c0;
+}
 .desc-title{font-weight:bold;font-size:16px;margin-top:16px;color:#333;}
 .tip-text{color:#d93025;font-weight:500;margin-top:8px;}
 .img-error-text{
@@ -77,9 +91,10 @@ background:#4488ff;
 <h3>官方提交备注</h3>
 <p>本演示页面仅为本地原理模拟，<span class="highlight">不会向阳光高考/学信网真实服务器发送任何请求</span>，所有真实漏洞复现证据均以报告截图为准。</p>
 </div>
+<!-- 第三頁（最後一頁）：左邊上一頁按鈕，右邊留空 -->
 <div class="nav">
-<a href="index2.html">上一页</a>
-<a class="disabled">最后一页</a>
+<a class="nav-btn" href="index2.html">上一页</a>
+<span></span>
 </div>
 </div>
 <script>
@@ -94,3 +109,4 @@ document.getElementById('searchErrorText').style.display='block';
 </script>
 </body>
 </html>
+
