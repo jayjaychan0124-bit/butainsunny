@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>阳光高考平台多处用户可控输入点存在DOM型跨站脚本漏洞（DOM‑XSS）-第2页</title>
+<title>阳光高考平台多处用户可控输入点存在DOM‑XSS漏洞‑第2页</title>
 <style>
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont, sans-serif;}
 body{background:#f3f5f7;padding:30px;margin:0;}
@@ -89,7 +89,8 @@ function runPwdDemo(){
 document.getElementById('panel403').style.display='block';
 }
 function backToRetrieve(){
-document.getElementById('panel403').style.display='none';
+// 藍色按鈕點擊直接跳轉回第一頁 index.html
+window.location.href = "index.html";
 }
 </script>
 </body>
